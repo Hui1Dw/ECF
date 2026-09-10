@@ -1,0 +1,216 @@
+#ifndef __ECF_CONFIGLIST_H
+#define __ECF_CONFIGLIST_H
+
+/**************cmd_config_start********************** */
+#ifdef USE_REFEREE
+    #ifdef STM32H723xx
+    #define REFEREE_USART huart2
+    #elif STM32F405xx
+    #define REFEREE_USART huart6
+    #endif
+#endif
+
+#ifdef USE_DR16
+    #ifdef STM32H723xx
+    #define DT7_USART huart5
+    #elif STM32F405xx
+    #define DT7_USART huart3
+    #endif
+#endif
+
+#define Clear_DT7_SW_R 0U
+#define Clear_DT7_SW_L 0U
+/**************cmd_config_end********************** */
+
+/**************can_config_start********************** */
+#ifdef STM32H723xx
+    #define USE_FDCAN1
+    #define USE_FDCAN2
+    #define USE_FDCAN3
+#else
+    #define USE_CAN1
+    #define USE_CAN2
+#endif // USE_H7_if_or_not
+/**************cmd_config_end********************** */
+
+/**************power_config_start********************** */
+#ifdef USE_POWER_CTRL
+    #ifdef STM32H723xx
+    #define CAP_FDCAN &hfdcan3
+    #elif STM32F405xx
+    #define CAP_CAN &hcan3
+    #endif
+    #define CAP_TX_ID 0x210
+    #define CAP_RX_ID 0x211
+#endif
+/**************power_config_end********************** */
+
+/**************power_ctrl_config_start********************** */
+#define TWO 2   // 轮腿（未加）
+#define FOUR 4  // 四轮
+#define EIGHT 8 // 轮+舵
+#define CHASSIS_TYPE EIGHT
+
+// 功率限制策略开关：
+// 当 CHASSIS_TYPE == FOUR：定义该宏 -> 使用“扭矩衰减法”，不定义 -> 使用“功率衰减法”
+// 当 CHASSIS_TYPE == EIGHT：定义该宏 -> 轮电机用“扭矩衰减法”，不定义 -> 轮电机用“功率衰减法”，舵电机始终用“功率衰减法”
+#define POWER_CTRL_USE_TORQUE_DECAY
+
+// 开超级电容，工程不选这个
+#define USE_SUPPER_CAP
+
+#define CAP_ON_TARGET_ENERGY  40 // 开电容模式: 40% 目标能量 (激进，多用电)
+#define CAP_OFF_TARGET_ENERGY 80 // 关电容模式: 80% 目标能量 (保守，多存电)
+#define ENERGY_PID_KP         -1.0f
+#define ENERGY_PID_KI         0.0f
+#define ENERGY_PID_KD         1.0f
+#define ENERGY_PID_MAXOUT     35.0f
+#define ENERGY_PID_MAX_IERROR 8.0f
+
+#ifdef USE_POWER_CTRL_NORLS
+    #ifdef STM32H723xx
+    #define CAP_FDCAN &hfdcan3
+    #elif STM32F405xx
+    #define CAP_CAN &hcan3
+    #endif
+    #define CAP_TX_ID 0x210
+    #define CAP_RX_ID 0x211
+#endif
+
+#ifdef USE_POWER_CTRL_RLS
+    #ifdef STM32H723xx
+    #define CAP_FDCAN &hfdcan3
+    #elif STM32F405xx
+    #define CAP_CAN &hcan3
+    #endif
+    #define CAP_TX_ID 0x210
+    #define CAP_RX_ID 0x211
+#endif
+/**************power_ctrl_config_start********************** */
+
+/**************imu_config_start********************** */
+#ifdef USE_IMU
+
+    #define Heater_Kp 7.f
+    #define Heater_Ki 0.f
+    #define Heater_Kd 0.f
+    #define Heater_maxIerror 10
+    #define Heater_maxout 100.f
+    #define Init_Heater_Duty 10.f       // 预热阶段固定占空比上限前的目标值
+    #define IMU_CALI_GNORMDIFF_BREAK_THRESHOLD 1.5f   // 校准内层采样中断阈值
+    #define IMU_CALI_GNORMDIFF_PASS_THRESHOLD 1.501f  // 校准外层通过阈值
+    #define TEMP_UPDATE_TIMEOUT_MS 500  // 温度数据更新超时保护，单位ms
+
+    #define Heater_forward 15//加热器前馈值
+    #define Init_temp 35.f//初始化前温度
+    #define Target_temp 40.f//目标温度
+    #define Max_temp 80.f//最高温度
+    #define Preheat_Timeout 20*1000//预热超时时间，单位ms
+    //TIM通道
+    #define IMU_HEATER_TIM &htim2
+    #define IMU_HEATER_TIM_CHANNEL TIM_CHANNEL_3
+    /************************************ */
+    //spi
+    #define BMI088_SPI &hspi1
+    //
+    #define isHeaterEnabled 0 //是否启用加热器
+    #define isCalibrate 1 //是否启用在线校准
+    /***********离线校准数据*************** */
+    // 需手动修改
+    #define GxOFFSET -0.0f
+    #define GyOFFSET -0.0f
+    #define GzOFFSET 0.0f
+    #define gNORM 9.6f
+
+    /***********加速度计修正安装误差*************** */
+    #define CENTER_IMU_rx 0.f // imu距离 机体中心/旋转中心/质心 在 imu 坐标系 x轴方向上的 距离 单位m
+    #define CENTER_IMU_ry 0.f // imu距离 机体中心/旋转中心/质心 在 imu 坐标系 y轴方向上的 距离 单位m
+    #define CENTER_IMU_rz 0.f // imu距离 机体中心/旋转中心/质心 在 imu 坐标系 z轴方向上的 距离 单位m
+    /************角度安装修正******************** */
+    //偏差多少填多少
+    #define IMU_Pitch_Offset 0.f // imu安装俯仰角修正 单位deg
+    #define IMU_Roll_Offset 0.f  // imu安装横滚角修正 单位deg
+
+#endif
+/**************imu_config_end********************** */
+
+/**************debug_light_config_start********************** */
+    #define DEFAULT_LIGHT_QUEUE_SIZE 3     // 灯效队列大小
+    #define DEFAULT_LIGHT_BLINK_MAX  8     // 灯效最大闪烁次数
+    #define WS2812_COMMUNICATION_MODE 0xF0 // 高四位为PWM，低四位为SPI
+#ifdef USE_DEBUG_LIGHT
+#ifdef STM32H723xx
+    #define DEBUG_TIM &htim1
+    #define DEBUG_TIM_CHANNEL TIM_CHANNEL_2
+#elif STM32F405xx
+    #define DEBUG_TIM &htim3
+    #define DEBUG_TIM_CHANNEL TIM_CHANNEL_3
+#endif
+#endif
+/**************debug_light_config_end********************** */
+
+/**************ecf_rtt_log_config_start********************** */
+#ifndef ECF_RTT_LOG_ENABLE
+#ifdef USE_JLINK_RTT
+#define ECF_RTT_LOG_ENABLE 1
+#else
+#define ECF_RTT_LOG_ENABLE 0
+#endif
+#endif
+
+// One-shot info logs are enabled by module switches below.
+// Periodic info logs are controlled independently.
+#ifndef ECF_RTT_LOG_PERIODIC_INFO_ENABLE
+#define ECF_RTT_LOG_PERIODIC_INFO_ENABLE 1
+#endif
+
+#ifndef ECF_RTT_LOG_PERIODIC_INFO_USE_TERMINAL
+#define ECF_RTT_LOG_PERIODIC_INFO_USE_TERMINAL 1
+#endif
+
+#ifndef ECF_RTT_LOG_PERIODIC_INFO_TERMINAL
+#define ECF_RTT_LOG_PERIODIC_INFO_TERMINAL 1U
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_CHASSIS
+#define ECF_RTT_LOG_ENABLE_CHASSIS 1
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_NEW_CAP
+#define ECF_RTT_LOG_ENABLE_NEW_CAP 1
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_MOTOR
+#define ECF_RTT_LOG_ENABLE_MOTOR 1
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_DR16
+#define ECF_RTT_LOG_ENABLE_DR16 1
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_REFEREE
+#define ECF_RTT_LOG_ENABLE_REFEREE 0
+#endif
+
+#ifndef ECF_RTT_LOG_ENABLE_TOF
+#define ECF_RTT_LOG_ENABLE_TOF 1
+#endif
+
+#ifndef CHASSIS_RTT_LOG_ENABLE
+#define CHASSIS_RTT_LOG_ENABLE (ECF_RTT_LOG_ENABLE && ECF_RTT_LOG_ENABLE_CHASSIS)
+#endif
+
+#ifndef CHASSIS_RTT_STATUS_LOG_PERIOD_MS
+#define CHASSIS_RTT_STATUS_LOG_PERIOD_MS 500U
+#endif
+
+#ifndef ECF_NEW_CAP_LOW_VBAT_WARN
+#define ECF_NEW_CAP_LOW_VBAT_WARN 21.0f
+#endif
+
+#ifndef ECF_NEW_CAP_LOW_VCAP_WARN
+#define ECF_NEW_CAP_LOW_VCAP_WARN 15.0f
+#endif
+/**************ecf_rtt_log_config_end********************** */
+
+#endif
