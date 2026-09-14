@@ -1,6 +1,7 @@
 add_library(clai_ecf STATIC
     Bsp/SPI/bsp_spi.cpp
     MotorCore/dm_driver_core.cpp
+    MotorCore/lho6_driver_core.cpp
     MotorCore/mit_controller.cpp
     Spi2Can/mcp2518fd.cpp
 )
@@ -15,6 +16,7 @@ target_include_directories(clai_ecf PUBLIC
     Bsp/SPI
     Config
     DMMotor
+    LHO6Hand
     MotorCore
     Spi2Can
 )

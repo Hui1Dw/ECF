@@ -79,11 +79,11 @@ namespace BSP_n {
             protected:
                 static uint8_t idx_;                      // 全局CAN实例索引,每次有新的模块注册会自增
                 uint32_t tx_mailbox_;                      // CAN消息填入的邮箱号
-                uint8_t rx_len_;                          // 接收长度,可能为0-8
 
             public:
                 uint32_t tx_id_;                          // 发送id
                 uint32_t rx_id_;                          // 接收id
+                uint8_t rx_len_ = 0;                      // 接收长度,可能为0-8
                 uint8_t rx_buff_[8];                       // 数据接收
                 uint8_t tx_buff_[8];                       // 发送缓存,发送消息长度可以通过ECF_CAN_SetDLC()设定,最大为8
                 float tx_wait_time_;                      // block时间
