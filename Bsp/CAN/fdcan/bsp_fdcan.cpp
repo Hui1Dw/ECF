@@ -326,6 +326,26 @@ struct FDCANKey {
         }
     }
 
+    /// @brief 把 FDCAN DLC 编码转成经典 CAN 的真实字节数。
+    /// @param dlc HAL 的 DataLength / FDCAN_DLC_BYTES_x。
+    /// @return 0..8；超过 8 字节的 FD 帧返回 0，避免按编码值 memcpy。
+    static uint8_t ClassicCanLengthFromDlc(uint32_t dlc)
+    {
+        switch (dlc)
+        {
+            case FDCAN_DLC_BYTES_0: return 0;
+            case FDCAN_DLC_BYTES_1: return 1;
+            case FDCAN_DLC_BYTES_2: return 2;
+            case FDCAN_DLC_BYTES_3: return 3;
+            case FDCAN_DLC_BYTES_4: return 4;
+            case FDCAN_DLC_BYTES_5: return 5;
+            case FDCAN_DLC_BYTES_6: return 6;
+            case FDCAN_DLC_BYTES_7: return 7;
+            case FDCAN_DLC_BYTES_8: return 8;
+            default: return 0;
+        }
+    }
+
     /// @brief 回调函数，在接收之后回调解析数据
     /// @param _hfdcan fdcan句柄
     /// @param fifox   哪个fifo
@@ -347,9 +367,11 @@ struct FDCANKey {
             {
                 // 创建临时实例用于回调
                 static Fdcan_c temp_instance;
+                const uint8_t rx_len = ClassicCanLengthFromDlc(rxconf.DataLength);
                 temp_instance.rx_id_ = received_id;
-                temp_instance.rx_len_ = rxconf.DataLength;
-                memcpy(temp_instance.rx_buff_, fdcan_rx_data, rxconf.DataLength);
+                temp_instance.rx_len_ = rx_len;
+                memset(temp_instance.rx_buff_, 0, sizeof(temp_instance.rx_buff_));
+                memcpy(temp_instance.rx_buff_, fdcan_rx_data, rx_len);
                 temp_instance.fdcan_handle_ = _hfdcan;
 
                 // 调用回调函数

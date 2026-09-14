@@ -117,6 +117,11 @@ int main() {
     assert(left.GetFeedbackData().position.joint[5] == 6);
     assert(left.GetFeedbackData().online);
 
+    uint8_t pos_read_echo[1] = {0x01};
+    left_can.Inject(LHO6_LEFT_CAN_ID, pos_read_echo, sizeof(pos_read_echo));
+    assert(left.GetFeedbackData().position.joint[0] == 1);
+    assert(left.GetFeedbackData().position.joint[5] == 6);
+
     uint8_t speed_frame[7] = {0x05, 21, 22, 23, 24, 25, 26};
     left_can.Inject(LHO6_LEFT_CAN_ID, speed_frame, sizeof(speed_frame));
     assert(left.GetFeedbackData().speed.joint[0] == 21);

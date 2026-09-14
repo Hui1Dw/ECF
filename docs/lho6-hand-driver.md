@@ -24,6 +24,7 @@
 | 文件 | 为什么改 |
 | --- | --- |
 | `Bsp/CAN/bsp_can_template.hpp` | 把 `rx_len_` 放到 public，并默认初始化为 0。LHO6 读命令是 1 字节、写关节是 7 字节，解析必须知道真实 DLC。 |
+| `Bsp/CAN/fdcan/bsp_fdcan.cpp` | 接收回调把 `DataLength` 转成经典 CAN 的 0..8 字节，再写入 `rx_len_`。 |
 | `CMakeLists.txt` | 把 `lho6_driver_core.cpp` 和 `LHO6Hand` 头文件路径加进库目标。 |
 | `README.md` | 补目录说明。 |
 | `docs/decoupled-architecture-learning.md` | 加一份指向本文的入口。 |
@@ -115,9 +116,12 @@ can.Transmit()
 
 - 位置 / 速度 / 力矩限制 / 堵转参数
 - 写位置回显过滤：回包若与目标完全一致，不覆盖真实位置
+- 1 字节位置读回显 `0x01` 不覆盖真实位置
 - 压力矩阵分片
 - 工厂编码分片
 - `UpdateOnlineStatus()` 超时离线
+
+`Fdcan_c` 接收路径现在会把 HAL 的 DLC 编码转成真实字节数。LHO6 是第一个按 `rx_len_` 解析变长帧的驱动，不能再把 `rxconf.DataLength` 直接当长度用。
 
 本轮没有把 `PackLho6HandsFeedback()` 放进库。那是 USB 36 字节打包，属于 `MotorCtrl` 通信层。
 
